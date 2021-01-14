@@ -1,3 +1,4 @@
+#This code is an adapted version of the original available here: https://github.com/MichiganCOG/TASED-Net
 import os
 import torch
 import time

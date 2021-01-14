@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jan 20 17:33:45 2020
-
-@author: fproietto
-"""
 from torch.utils.data import DataLoader
 
 # from gist.github.com/MFreidank/821cc87b012c53fade03b0c7aba13958
