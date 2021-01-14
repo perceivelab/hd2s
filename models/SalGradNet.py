@@ -64,12 +64,12 @@ class SalGradNet(nn.Module):
         x4 = self.conv_t4(features4)
         sal4 = self.decoder4(x4.squeeze(2))
         
-        ############# DECONV 3
+        #DECONV 3
         x3 = self.conv_t3_1(features3)
         x3 = self.conv_t3_2(x3)
         sal3 = self.decoder3(x3.squeeze(2))
         
-        ############# DECONV 2
+        #DECONV 2
         x2 = self.conv_t2_1(features2)
         x2 = self.conv_t2_2(x2)
         x2 = self.conv_t2_3(x2)
