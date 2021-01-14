@@ -4,14 +4,11 @@ import numpy as np
 import cv2
 import torch
 import pandas as pd
-
 from scipy.ndimage.filters import gaussian_filter
 from tqdm import tqdm
 from PIL import Image
 
-
 from models.SalGradNet import SalGradNet as modelName
-
 
 dev = 'cuda:0'
 image_size=(128, 192)

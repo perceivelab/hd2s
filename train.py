@@ -31,10 +31,10 @@ def main():
     image_size=(128,192)
     
     num_iters = 5000
-    num_workers = 0
+    num_workers = 2
     lr=0.001
     
-    num_val_iter = 10
+    num_val_iter = 100
     encoder_pretrained= True
     file_weight='none'
     
