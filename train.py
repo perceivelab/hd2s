@@ -38,7 +38,7 @@ def main():
     encoder_pretrained= True
     file_weight='none'
     
-    test_name= 'SalGradNet_training_demo_1'
+    test_name= 'HD2S_training_demo_1'
     
     subfolder='BaseModel'
     path_source_data = [os.path.join('data','DHF1K','train')]
@@ -70,8 +70,8 @@ def main():
         os.makedirs(path_output)    
 
     '''
-    # load file weight (fine-tuning)
-    weight_folder='SalGradNet_training_demo_1'
+    # loading weights file (fine-tuning)
+    weight_folder='HDS_training_demo_1'
     weight_name='weight_MinLoss.pt'
     file_weight=os.path.join('output','model_weights',subfolder,weight_folder,weight_name)
     
@@ -82,13 +82,13 @@ def main():
     model = modelName(pretrained=encoder_pretrained)
     model = model.to(dev)
     '''
-    # load file weight (fine-tuning)
+    # loading file weight (fine-tuning)
     model.load_state_dict(torch.load(file_weight, map_location=dev))
     '''
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=2e-7)
     
     '''
-    # load optimizer (fine-tuning)
+    # loading optimizer (fine-tuning)
     #optimizer.load_state_dict(torch.load(file_optimizer))
     '''
    
@@ -132,9 +132,9 @@ def main():
     '''
     with open(os.path.join('output', subfolder, test_name, 'check_point.json')) as fp:
         check_point=json.load(fp)
+    step = check_point['step']
     '''
         
-    #step = check_point['step']
     '''
     preparation dict for validation set
     '''

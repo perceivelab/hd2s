@@ -1,32 +1,49 @@
-#This code is an adapted version of the original available here: https://github.com/MichiganCOG/TASED-Net
 import os
 import numpy as np
 import cv2
 import torch
 import pandas as pd
-from scipy.ndimage.filters import gaussian_filter
 from tqdm import tqdm
 from PIL import Image
 
-from models.SalGradNet import SalGradNet as modelName
+from models.HD2S_DSL import HD2S_DSL as modelName
 
-dev = 'cuda:0'
+source_datasets = [{'source': 'DHF1K', 'path': os.path.join('data','DHF1K','validation')}, 
+            {'source': 'Hollywood', 'path': os.path.join('data','Hollywood2','test')},
+            {'source': 'UCFSports', 'path': os.path.join('data','UCF','test')}]
+
+
+dataset_index = 0
+fromVideo=False
+dev = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 image_size=(128, 192)
 
+
+dataset_source = source_datasets[dataset_index]['source']
+encoder_pretrained = False
+
+'''
+Model Parameters
+'''
+dict_model_params={
+    'n_gaussian' : 16,
+    'domSpec_bn' : True,
+    'gaussian_layer' : True,
+    'gaussian_priors' : True,
+    'max_sigma' : 10
+    }
+
 def main():
-    target_dataset=os.path.join('DHF1K','validation')
-    fromVideo=False
     
+    test_name=f'HD2S_testDHF1K_{dataset_source}_demo'
+    weight_folder='HDS2_DSL_training_demo'
+    weight_name='HD2S_DSL_weigths_MinLoss.pt'
+    subfolder = os.path.join("DSL")
     len_temporal = 16
-    
-    test_name='HD2S_testDHF1K_demo'
-    weight_folder='HD2S_train_demo'
-    subfolder = 'BaseModel'
-    weight_name='weight_MinLoss.pt'
     
     file_weight = os.path.join('output', 'model_weights', subfolder, weight_folder, weight_name)
     
-    data_folder=os.path.join('data', target_dataset)
+    data_folder = source_datasets[dataset_index]['path']
     video_folder=os.path.join('video')
     frames_folder='frames'
     path_output = os.path.join('output', subfolder, test_name)
@@ -35,19 +52,34 @@ def main():
     path_frames=os.path.join(data_folder, frames_folder)
     
     
-    model=modelName()
-    model.load_state_dict(torch.load(file_weight, map_location = dev))
-    
+    model=modelName(pretrained=encoder_pretrained,n_gaussians=dict_model_params['n_gaussian'], 
+                    sources= [dataset_source], domSpec_bn =dict_model_params['domSpec_bn'], gaussian_priors =dict_model_params['gaussian_priors'],
+                    gaussian_layer = dict_model_params['gaussian_layer'])
     model=model.to(dev)
+    weight_dict = torch.load(file_weight, map_location = dev)
+    model.load_state_dict(weight_dict, strict = False)
+    
     torch.backends.cudnn.benchmark = True
     model.eval()
-
+    
     if not os.path.isdir(os.path.join('output',subfolder,test_name)):
         os.makedirs(os.path.join('output',subfolder, test_name))
-
+    
+    #saving test info
+    info=['model_name: ', model.__class__.__name__ ,'\n',
+          'model_parameters: ', str(dict_model_params), '\n',
+          'len_temporal: ', str(len_temporal),'\n',
+          'image_size: ',  str(image_size),'\n',
+          'file_weight: ', str(file_weight),'\n'
+          ]
+    file_info=open(os.path.join("output", subfolder, test_name, "info.txt"), 'w', encoding='utf-8')
+    file_info.writelines(info)
+    file_info.close()
+    
+    
     if fromVideo:
-        if target_dataset=='LEDOV' or target_dataset=='UAV123':
-            list_video= pd.read_csv(os.path.join('data',target_dataset,'test.csv'))['0'].values.tolist()
+        if dataset_source=='LEDOV' or dataset_source=='UAV123':
+            list_video= pd.read_csv(os.path.join('data',dataset_source,'test.csv'))['0'].values.tolist()
             list_video.sort()
         else:   
             list_video = [v for v in os.listdir(path_video) if os.path.isfile(os.path.join(path_video, v))] 
@@ -73,7 +105,7 @@ def main():
             
             original_length= len(list_frames)
             
-            # if number of video frames are less of 2*lentemporal, we append the frames to the list in reverse order
+            #if number of video frames are less of 2*lentemporal, we append the frames to the list by going back
             if original_length<2*len_temporal-1:
                 num_missed_frames =  2*len_temporal -1 - original_length
                 for k in range(num_missed_frames):
@@ -86,10 +118,13 @@ def main():
                 overlap=[None]*original_length
     
                 snippet = []
-                for i in tqdm(range(len(list_frames)), desc=f"number of frames: {len(list_frames)}"):
+                print(f"numbers of frames: {len(list_frames)}")
+                for i in tqdm(range(len(list_frames))):
                     img = list_frames[i]
                    
+                    
                     snippet.append(img)
+                    
                     if i<original_length:
                         overlap[i]=Image.fromarray(np.uint8(list_frames[i]), "RGB")
                     
@@ -97,8 +132,8 @@ def main():
                         
                         if i < original_length:#only for the original frames
                             clip = transform(snippet)
-                            frames_mask[i]=process(model, clip, i, destination_path)
-                        
+                            frames_mask[i]=process(model, dataset_source, clip, i, destination_path)
+                            
                             img = cv2.applyColorMap(frames_mask[i],cv2.COLORMAP_HOT)
                             img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
                         
@@ -106,16 +141,29 @@ def main():
                             
                         if (i<2*len_temporal-2):
                             j=i-len_temporal+1
-                            frames_mask[j] = process(model, torch.flip(clip, [1]), j, destination_path)
+                            frames_mask[j] = process(model, dataset_source, torch.flip(clip, [1]), j, destination_path)
+                            
                             img = cv2.applyColorMap(frames_mask[j],cv2.COLORMAP_HOT)
                             img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
                             overlap[j].paste(Image.fromarray(img), mask=Image.fromarray(frames_mask[j]))
+                            
                         del snippet[0]
                         
                 if not os.path.isdir(os.path.join(destination_path,'images')):
                         os.mkdir(os.path.join(destination_path,'images'))
                 for idx in range(len(overlap)):
                     overlap[idx].save(os.path.join(destination_path, 'images', '%04d.jpg'%(idx+1)), format='JPEG', quality=100)
+                
+                '''
+                #saving the gif file...
+                v_name=os.path.splitext(v)[0]+'.gif'
+                
+                
+                overlap[0].save(os.path.join(destination_path,v_name) , format='GIF',
+                       append_images=overlap[1:],
+                       save_all=True,
+                       duration=40, loop=0)
+                '''
             else: print("more frames are needed")
 
 
@@ -137,27 +185,24 @@ def resized_frames_from_video(v, path_video):
 
 
 def transform(snippet):
-    snippet = np.concatenate(snippet, axis=-1)
-    snippet = torch.from_numpy(snippet).permute(2, 0, 1).contiguous().float()
-    snippet = snippet.mul_(2.).sub_(255).div(255)
+    snippet = np.concatenate(snippet, axis=-1)  
+    snippet = torch.from_numpy(snippet).permute(2, 0, 1).contiguous().float()  
+    snippet = snippet.mul_(2.).sub_(255).div(255)     
     snippet = snippet.view(1,-1,3,snippet.size(1),snippet.size(2)).permute(0,2,1,3,4) 
     return snippet
 
      
 
-def process(model, clip, idx, path_output):
+def process(model, dataset_source, clip, idx, path_output):
     frames_path = os.path.join(path_output,'frames')
     if not os.path.isdir(frames_path):
         os.mkdir(frames_path)
         
     with torch.no_grad():
-        _,_,_,_, smap = model(clip.to(dev))
-        
-    smap=smap.cpu().data[0]
+        _,_,_,_, smap = model(clip.to(dev), dataset_source)
     
-    smap = (smap.numpy()*255.).astype(np.int)/255.
-    smap = gaussian_filter(smap, sigma=5)
-    smap = (smap/np.max(smap)*255.).astype(np.uint8)
+    smap=smap.cpu().data[0].numpy()
+    smap=(smap/np.max(smap)*255.).astype(np.uint8)
     cv2.imwrite(os.path.join(frames_path, '%04d.png'%(idx+1)), smap)
     
     return smap
