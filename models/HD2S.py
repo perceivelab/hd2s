@@ -4,11 +4,11 @@ import torch.nn as nn
 from models.S3D_featureExtractor import S3D_featureExtractor_multi_output, BasicConv3d
 from models.Decoders import Decoder2, Decoder3, Decoder4, Decoder5
 
-__all__ = ['SalGradNet']
+__all__ = ['HD2S']
 
-class SalGradNet(nn.Module):
+class HD2S(nn.Module):
     def __init__(self, pretrained=False):
-        super(SalGradNet, self).__init__()
+        super(HD2S, self).__init__()
         self.featureExtractor=S3D_featureExtractor_multi_output()
         
         #conv_t: T/8-->1

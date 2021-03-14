@@ -13,7 +13,7 @@ from tqdm import tqdm
 from matplotlib import pyplot as plt
 from torchsummary import summary
 
-from models.SalGradNet import SalGradNet as modelName
+from models.HD2S import HD2S as modelName
 from loss import KLDLoss1vs1
 from dataset.datasetDHF1K import Dataset3D
 from dataset.infiniteDataLoader import InfiniteDataLoader
@@ -26,7 +26,7 @@ def main():
     pile = 25
     batch_size = 16
     len_temporal = 16
-    validation_frac = 0.5 # fraction of validation set videos used during each validation
+    validation_frac = 0.5 
     
     image_size=(128,192)
     
