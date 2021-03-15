@@ -9,7 +9,7 @@ Examples of saliency prediction in complex scenes (from DHF1K dataset):
 
 ![](gif/0685.gif)
 
-![](gif/0698.gif)
+![](gif/0609.gif)
 
 ## Notes
 
