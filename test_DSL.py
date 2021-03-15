@@ -12,12 +12,10 @@ source_datasets = [{'source': 'DHF1K', 'path': os.path.join('data','DHF1K','vali
             {'source': 'Hollywood', 'path': os.path.join('data','Hollywood2','test')},
             {'source': 'UCFSports', 'path': os.path.join('data','UCF','test')}]
 
-
 dataset_index = 0
 fromVideo=False
 dev = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 image_size=(128, 192)
-
 
 dataset_source = source_datasets[dataset_index]['source']
 encoder_pretrained = False
@@ -76,7 +74,6 @@ def main():
     file_info.writelines(info)
     file_info.close()
     
-    
     if fromVideo:
         if dataset_source=='LEDOV' or dataset_source=='UAV123':
             list_video= pd.read_csv(os.path.join('data',dataset_source,'test.csv'))['0'].values.tolist()
@@ -105,7 +102,7 @@ def main():
             
             original_length= len(list_frames)
             
-            #if number of video frames are less of 2*lentemporal, we append the frames to the list by going back
+            #if the number of video frames are less of 2*lentemporal, we append the frames to the list by going back
             if original_length<2*len_temporal-1:
                 num_missed_frames =  2*len_temporal -1 - original_length
                 for k in range(num_missed_frames):
@@ -122,7 +119,6 @@ def main():
                 for i in tqdm(range(len(list_frames))):
                     img = list_frames[i]
                    
-                    
                     snippet.append(img)
                     
                     if i<original_length:
@@ -172,9 +168,7 @@ def resized_frames_from_video(v, path_video):
     print(os.path.join(path_video,v))
     vidcap = cv2.VideoCapture(os.path.join(path_video,v))
     success,image = vidcap.read()
-    
     frames=[]
-    
     success = True
     while success:
         image = cv2.resize(image, dsize=(image_size[1], image_size[0]),interpolation=cv2.INTER_CUBIC)

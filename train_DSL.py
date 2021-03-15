@@ -19,7 +19,7 @@ from loss import KLDLoss1vs1
 from dataset.videoDataset import Dataset3D
 from dataset.infiniteDataLoader import InfiniteDataLoader
 
-'''
+
 source_datasets = [{'source': 'DHF1K', 'path': os.path.join('data','DHF1K','source')}, 
             {'source': 'Hollywood', 'path': os.path.join('data','Hollywood2','train')},
             {'source': 'UCFSports', 'path': os.path.join('data','UCF','train')}]
@@ -27,15 +27,6 @@ source_datasets = [{'source': 'DHF1K', 'path': os.path.join('data','DHF1K','sour
 validation_datasets = [{'source': 'DHF1K', 'path': os.path.join('data','DHF1K','source')},
             {'source': 'Hollywood', 'path': os.path.join('data','Hollywood2','train')},
             {'source': 'UCFSports', 'path': os.path.join('data','UCF','train')}]
-'''
-
-source_datasets = [{'source': 'DHF1K', 'path': os.path.join("C:\\","Users","gbellitto","Desktop","GitRepository","video-saliency-detection","data","DHF1K","source")}, 
-            {'source': 'Hollywood', 'path': os.path.join("C:\\","Users","gbellitto","Desktop","GitRepository","video-saliency-detection","data",'Hollywood2','train')},
-            {'source': 'UCFSports', 'path': os.path.join("C:\\","Users","gbellitto","Desktop","GitRepository","video-saliency-detection","data",'UCF','train')}]
-
-validation_datasets = [{'source': 'DHF1K', 'path': os.path.join("C:\\","Users","gbellitto","Desktop","GitRepository","video-saliency-detection","data",'DHF1K','source')},
-            {'source': 'Hollywood', 'path': os.path.join("C:\\","Users","gbellitto","Desktop","GitRepository","video-saliency-detection","data",'Hollywood2','train')},
-            {'source': 'UCFSports', 'path': os.path.join("C:\\","Users","gbellitto","Desktop","GitRepository","video-saliency-detection","data",'UCF','train')}]
 
 
 def main():
@@ -87,7 +78,6 @@ def main():
     
     for idx, p in enumerate(path_source_data):
         
-        #print(idx)
         print(p)
         
         if 'LEDOV' in p:
@@ -428,7 +418,7 @@ def main():
                 plt.savefig(os.path.join('output', subfolder, test_name,'loss_validation.png'))
                 plt.close()
                 
-                #Plot validation loss Per-Dataset
+                #Plot validation per-dataset loss 
                 x = torch.arange(1, len(check_point['per_dataset_loss'][f'val_{list_source_validation[0]}'])+1).numpy()
                 for s in list_source_validation:
                     plt.plot(x, check_point['per_dataset_loss'][f'val_{s}'], label=f"val_loss {s}")
@@ -452,15 +442,10 @@ def main():
   
         
 def transform(snippet):
-    snippet = np.concatenate(snippet, axis=-1)  # 224 x 384 x 24
-    snippet = torch.from_numpy(snippet).permute(2, 0, 1).contiguous().float()  #24 x 224 x 384
+    snippet = np.concatenate(snippet, axis=-1)
+    snippet = torch.from_numpy(snippet).permute(2, 0, 1).contiguous().float()
     snippet = snippet.mul_(2.).sub_(255).div(255)
-                                # 1 x 8 x 3 x 224 x 384           1 x 3 x 8 x 224 x 384
-                                #          |                           |            
     snippet = snippet.view(1,-1,3,snippet.size(1),snippet.size(2)).permute(0,2,1,3,4) 
-    ''' a differenza del transform usato nel dataloader qui aggiungiuamo quell' 1 iniziale, a rappresentare 
-        la dimensione del batch, perchè il modello vuole in input: batch x C x len_temporal x H x W
-    '''
     return snippet   
                 
 if __name__ == '__main__':
