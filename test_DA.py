@@ -1,4 +1,4 @@
-#This code is an adapted version of the original available here: https://github.com/MichiganCOG/TASED-Net
+
 import os
 import numpy as np
 import cv2
@@ -8,22 +8,25 @@ from scipy.ndimage.filters import gaussian_filter
 from tqdm import tqdm
 from PIL import Image
 
-from models.HD2S import HD2S as modelName
+from models.HD2S_DA import HD2S_DA as modelName
 
 dev = 'cuda:0'
 image_size=(128, 192)
 
 def main():
+    #target_dataset=os.path.join('Hollywood2','test')
+    #target_dataset=os.path.join('UCF','test')
     target_dataset=os.path.join('DHF1K','validation')
+    
     fromVideo=False
     len_temporal = 16
     
-    test_name='HD2S_testDHF1K_demo'
-    weight_folder='HD2S_train_demo'
-    subfolder = 'BaseModel'
-    weight_name='weight_MinLoss.pt'
+    test_name='HD2S_DA_testDHF1K_demo_1'
+    weight_folder='HD2S_DA_training_demo'
+    subfolder = 'DA'
+    weight_name='HD2S_DA_weights_MinLoss.pt'
     
-    file_weights = os.path.join('output', 'model_weights', subfolder, weight_folder, weight_name)
+    file_weights = os.path.join('output', 'model_weights',subfolder,  weight_folder, weight_name)
     
     data_folder=os.path.join('data', target_dataset)
     video_folder=os.path.join('video')
@@ -34,13 +37,26 @@ def main():
     path_frames=os.path.join(data_folder, frames_folder)
     
     model=modelName()
-    model.load_state_dict(torch.load(file_weights, map_location = dev))
+        
+    '''
+    When used for inferece, we do not need of Domain Adaptation branches.
+    We load HD2S_DA without them.
+    '''
+    weight_dict=torch.load(file_weights, map_location = dev)
+    model_dict=model.state_dict()
+    print('Loading weights..')
+    for name,param in weight_dict.items():
+        if name in model_dict:
+            assert param.size() == model_dict[name].size(), "param size don't match"
+            model_dict[name].copy_(param)
+    print('Loaded Completed')
     
     model=model.to(dev)
     torch.backends.cudnn.benchmark = True
     model.eval()
-
-    if not os.path.isdir(os.path.join('output',subfolder,test_name)):
+    
+        
+    if not os.path.isdir(os.path.join('output',subfolder, test_name)):
         os.makedirs(os.path.join('output',subfolder, test_name))
 
     if fromVideo:
@@ -71,32 +87,33 @@ def main():
             
             original_length= len(list_frames)
             
-            # if number of video frames are less of 2*lentemporal, we append the frames to the list in reverse order
+            #if number of video frames are less of 2*lentemporal, we append the frames to the list by going back
             if original_length<2*len_temporal-1:
                 num_missed_frames =  2*len_temporal -1 - original_length
                 for k in range(num_missed_frames):
                     list_frames.append(np.copy(list_frames[original_length-k-1]))
-            
+        
             # process in a sliding window fashion
             if len(list_frames) >= 2*len_temporal-1:
-        
+            
                 frames_mask=[None]*original_length
                 overlap=[None]*original_length
     
                 snippet = []
-                for i in tqdm(range(len(list_frames)), desc=f"number of frames: {len(list_frames)}"):
+                for i in tqdm(range(len(list_frames)), desc=f"numbers of frames: {len(list_frames)}" ):
                     img = list_frames[i]
-                   
+                    
                     snippet.append(img)
+                    
                     if i<original_length:
                         overlap[i]=Image.fromarray(np.uint8(list_frames[i]), "RGB")
                     
                     if (i>= len_temporal -1):
                         
-                        if i < original_length:#only for the original frames
+                        if i < original_length: #only for the original frames
                             clip = transform(snippet)
                             frames_mask[i]=process(model, clip, i, destination_path)
-                        
+                            
                             img = cv2.applyColorMap(frames_mask[i],cv2.COLORMAP_HOT)
                             img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
                         
@@ -108,8 +125,8 @@ def main():
                             img = cv2.applyColorMap(frames_mask[j],cv2.COLORMAP_HOT)
                             img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
                             overlap[j].paste(Image.fromarray(img), mask=Image.fromarray(frames_mask[j]))
+                            
                         del snippet[0]
-                        
                 if not os.path.isdir(os.path.join(destination_path,'images')):
                         os.mkdir(os.path.join(destination_path,'images'))
                 for idx in range(len(overlap)):
@@ -143,17 +160,17 @@ def transform(snippet):
 
 
 def process(model, clip, idx, path_output):
-    frames_path = os.path.join(path_output,'frames')
+    frames_path = os.path.join(path_output, 'frames')
     if not os.path.isdir(frames_path):
         os.mkdir(frames_path)
         
     with torch.no_grad():
         smap = model(clip.to(dev))
-        
+            
     smap=smap.cpu().data[0]
     smap = (smap.numpy()*255.).astype(np.int)/255.
     smap = gaussian_filter(smap, sigma=7)
-    smap = (smap/np.max(smap)*255.).astype(np.uint8)
+    smap=(smap/np.max(smap)*255.).astype(np.uint8)
     cv2.imwrite(os.path.join(frames_path, '%04d.png'%(idx+1)), smap)
     return smap
 

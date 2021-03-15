@@ -15,7 +15,7 @@ from torchsummary import summary
 
 from models.HD2S import HD2S as modelName
 from loss import KLDLoss1vs1
-from dataset.datasetDHF1K import Dataset3D
+from dataset.videoDataset import Dataset3D
 from dataset.infiniteDataLoader import InfiniteDataLoader
 
 
@@ -39,7 +39,6 @@ def main():
     file_weight='none'
     
     test_name= 'HD2S_training_demo_1'
-    
     subfolder='BaseModel'
     path_source_data = [os.path.join('data','DHF1K','train')]
     
@@ -72,10 +71,10 @@ def main():
     '''
     # loading weights file (fine-tuning)
     weight_folder='HDS_training_demo_1'
-    weight_name='weight_MinLoss.pt'
+    weight_name='weights_MinLoss.pt'
     file_weight=os.path.join('output','model_weights',subfolder,weight_folder,weight_name)
     
-    optim_name='adam.pt'
+    optim_name='adam_MinLoss.pt'
     file_optimizer=os.path.join('output','model_weights',subfolder,weight_folder,optim_name)
     '''
     

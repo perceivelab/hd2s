@@ -36,7 +36,7 @@ def main():
     test_name=f'HD2S_testDHF1K_{dataset_source}_demo'
     weight_folder='HDS2_DSL_training_demo'
     weight_name='HD2S_DSL_weigths_MinLoss.pt'
-    subfolder = os.path.join("DSL")
+    subfolder = 'DSL'
     len_temporal = 16
     
     file_weight = os.path.join('output', 'model_weights', subfolder, weight_folder, weight_name)
