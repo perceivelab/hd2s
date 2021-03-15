@@ -2,8 +2,14 @@
 [Video Saliency Detection with Domain Adaption using Hierarchical Gradient Reversal Layers](https://arxiv.org/abs/2010.01220)
 
 ## Examples
-
+Examples of saliency prediction in complex scenes (from DHF1K dataset):
 ![](gif/0648.gif)
+
+![](gif/0692.gif)
+
+![](gif/0685.gif)
+
+![](gif/0698.gif)
 
 ## Notes
 
