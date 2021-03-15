@@ -1,5 +1,10 @@
 # HD2S
 [Video Saliency Detection with Domain Adaption using Hierarchical Gradient Reversal Layers](https://arxiv.org/abs/2010.01220)
+
+##Examples
+
+![](gif/0648.gif)
+
 ## Notes
 
 - The code for train and test is an adapted version of the original available [here](https://github.com/MichiganCOG/TASED-Net).
