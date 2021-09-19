@@ -208,7 +208,6 @@ class HD2S_DSL(nn.Module):
         ############# DECONV 5
         x5 = self.conv_t5(features5)
         x5 = x5.squeeze(2)
-        #x5 = x5.view(x5.size(0), x5.size(1), x5.size(3), x5.size(4))
         
         if self.list_gaussian_priors[3]:
             gaussian_maps = self._get_gaussian_maps(x5, source_str, 5)
@@ -219,7 +218,6 @@ class HD2S_DSL(nn.Module):
         ############# DECONV 4
         x4 = self.conv_t4(features4)
         x4 = x4.squeeze(2)
-        #x4=x4.view(x4.size(0), x4.size(1), x4.size(3), x4.size(4))
         
         if self.list_gaussian_priors[2]:
             gaussian_maps = self._get_gaussian_maps(x4, source_str, 4)
@@ -231,7 +229,6 @@ class HD2S_DSL(nn.Module):
         x3 = self.conv_t3_1(features3)
         x3 = self.conv_t3_2(x3)
         x3 = x3.squeeze(2)
-        #x3 = x3.view(x3.size(0), x3.size(1), x3.size(3), x3.size(4))
         
         if self.list_gaussian_priors[1]:
             gaussian_maps = self._get_gaussian_maps(x3, source_str, 3)
@@ -244,7 +241,6 @@ class HD2S_DSL(nn.Module):
         x2 = self.conv_t2_2(x2)
         x2 = self.conv_t2_3(x2)
         x2 = x2.squeeze(2)
-        #x2 = x2.view(x2.size(0), x2.size(1), x2.size(3), x2.size(4))
         
         if self.list_gaussian_priors[0]:
             gaussian_maps = self._get_gaussian_maps(x2, source_str, 2)
@@ -266,7 +262,6 @@ class HD2S_DSL(nn.Module):
         else:
             out = self.__getattr__('last_block')(out)
         
-        #return  sal2.view(sal2.size(0),sal2.size(2), sal2.size(3)), sal3.view(sal3.size(0),sal3.size(2), sal3.size(3)), sal4.view(sal4.size(0),sal4.size(2), sal4.size(3)), sal5.view(sal5.size(0),sal5.size(2), sal5.size(3)), x.view(x.size(0),x.size(2), x.size(3))
         return  sal2.squeeze(1), sal3.squeeze(1), sal4.squeeze(1), sal5.squeeze(1), out.squeeze(1)
     
     

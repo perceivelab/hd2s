@@ -82,4 +82,4 @@ class HD2S(nn.Module):
         if self.training or out_consp:
             return  sal2.squeeze(1), sal3.squeeze(1), sal4.squeeze(1), sal5.squeeze(1), out.squeeze(1)
         
-        return x.squeeze(1)
+        return out.squeeze(1)
