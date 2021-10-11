@@ -43,12 +43,15 @@ Examples of video saliency prediction in complex scenes (from DHF1K dataset):
 
 ## Citation
 ```bibtex
-@article{bellitto2020video,
-  title={Video Saliency Detection with Domain Adaption using Hierarchical Gradient Reversal Layers},
-  author={Bellitto, Giovanni and Salanitri, Federica Proietto and Palazzo, Simone and Rundo, Francesco and Giordano, Daniela and Spampinato, Concetto},
-  journal={arXiv preprint arXiv:2010.01220},
-  year={2020}
+@article{bellitto2021hierarchical,
+  title={Hierarchical domain-adapted feature learning for video saliency prediction},
+  author={Bellitto, G and Proietto Salanitri, F and Palazzo, S and Rundo, F and Giordano, D and Spampinato, C},
+  journal={International Journal of Computer Vision},
+  pages={1--17},
+  year={2021},
+  publisher={Springer}
 }
 ```
+
 
 
