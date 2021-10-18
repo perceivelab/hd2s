@@ -25,8 +25,9 @@ source_datasets = [{'source': 'DHF1K', 'path': os.path.join('data','DHF1K','sour
             {'source': 'UCFSports', 'path': os.path.join('data','UCF','train')}]
 
 validation_datasets = [{'source': 'DHF1K', 'path': os.path.join('data','DHF1K','source')},
-            {'source': 'Hollywood', 'path': os.path.join('data','Hollywood2','train')},
-            {'source': 'UCFSports', 'path': os.path.join('data','UCF','train')}]
+            #{'source': 'Hollywood', 'path': os.path.join('data','Hollywood2','train')},
+            #{'source': 'UCFSports', 'path': os.path.join('data','UCF','train')}
+            ]
 
 
 def main():
