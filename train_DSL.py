@@ -55,12 +55,12 @@ def main():
     Model Parameters
     '''
     dict_model_params={
-        'n_gaussian' : 0,
-        'domSpec_bn' :False,
-        'gaussian_layer' : False,
-        'gaussian_priors' : False,
+        'n_gaussian' : 16,
+        'domSpec_bn' :True,
+        'gaussian_layer' : True,
+        'gaussian_priors' : True,
         'max_sigma' : 10,
-        'activate_GL' : False
+        'activate_GL' : True
         }
     
     
