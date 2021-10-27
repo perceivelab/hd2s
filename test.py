@@ -151,7 +151,7 @@ def process(model, clip, idx, path_output):
         smap = model(clip.to(dev))
         
     smap=smap.cpu().data[0]
-    smap = (smap.numpy()*255.).astype(np.int)/255.
+    smap = (smap.numpy()*255.).astype(int)/255.
     smap = gaussian_filter(smap, sigma=7)
     smap = (smap/np.max(smap)*255.).astype(np.uint8)
     cv2.imwrite(os.path.join(frames_path, '%04d.png'%(idx+1)), smap)

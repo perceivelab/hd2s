@@ -135,3 +135,13 @@ output/
 __pycache__/
 
 models/S3D_kinetics400.pt
+
+salience_metrics.py
+
+requirements.txt
+
+req.txt
+
+environment.yml
+
+calculate_metrics.py
