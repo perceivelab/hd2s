@@ -262,13 +262,13 @@ def main():
                                     clip = transform(snippet)
                                     clip=clip.to(dev)
                                     with torch.set_grad_enabled(False):
-                                        _,_,_,_,saliency_map[i]=model(clip)
+                                        saliency_map[i]=model(clip)
                                         
                                 if (i<2*len_temporal-2):
                                     j=i-len_temporal+1
                                     flipped_clip = torch.flip(clip, [1])
                                     with torch.set_grad_enabled(False):
-                                        _,_,_,_,saliency_map[j]=model(flipped_clip)
+                                        saliency_map[j]=model(flipped_clip)
                                         
                                 del snippet[0]
                     
