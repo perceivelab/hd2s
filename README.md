@@ -55,6 +55,10 @@ Examples of video saliency prediction in complex scenes (from DHF1K dataset):
 
 ![](gif/0674.gif)
 
+# License
+
+This code is released under [CC BY-NC 4.0 license](LICENSE.txt).
+
 
 
 
